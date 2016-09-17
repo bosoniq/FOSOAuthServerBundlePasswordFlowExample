@@ -1,0 +1,23 @@
+security:
+
+    encoders:
+        AppBundle\Entity\ApiUser: 
+            algorithm: bcrypt
+
+    providers:
+        webservice:
+            id: app.webservice_user_provider
+
+    firewalls:
+        oauth_token:
+            pattern:    ^/oauth/v2/token
+            security:  false
+
+        api:
+            pattern:    ^/api
+            fos_oauth:  true
+            stateless:  true
+            anonymous:  false # can be omitted as its default value
+
+    # access_control:
+    #     - { path: ^/api, roles: [ IS_AUTHENTICATED_FULLY ] } 
