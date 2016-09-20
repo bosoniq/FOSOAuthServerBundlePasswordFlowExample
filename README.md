@@ -1,68 +1,62 @@
-Symfony Standard Edition
-========================
+FOSOAuthServerBundle Password Flow Example
+==========================================
 
-Welcome to the Symfony Standard Edition - a fully-functional Symfony
-application that you can use as the skeleton for your new applications.
+This is a bear bones example of how to use FOSOAuthServerBundle to provide basic security in a simple password flow. The example uses only the FOSOAuthServerBundle, a basic custom user provider and the Symfony Standard Edition. 
 
-For details on how to download and get started with Symfony, see the
-[Installation][1] chapter of the Symfony Documentation.
 
-What's inside?
---------------
+Setup 
+-----
 
-The Symfony Standard Edition is configured with the following defaults:
+Firstly you need to create an Oauth client by visiting /createclient/ which is located in SecurityController.php
 
-  * An AppBundle you can use to start coding;
+Next you will need to create a user who will be able to access the api. You can manually put this into the database table. 
 
-  * Twig as the only configured template engine;
 
-  * Doctrine ORM/DBAL;
 
-  * Swiftmailer;
 
-  * Annotations enabled for everything.
+Getting your access token
+-------------------------
 
-It comes pre-configured with the following bundles:
+When you have your client and user copy and paste the required values into the URL below.
 
-  * **FrameworkBundle** - The core Symfony framework bundle
+```
+http://test/oauth_example/web/app_dev.php/oauth/v2/token?client_id=---CLIENT-DB-ID---_---CLIENT-SECRET---&client_secret=---CLIENT-SECRET---&grant_type=password&username=---USERNAME---&password=---PASSWORD---
+```
 
-  * [**SensioFrameworkExtraBundle**][6] - Adds several enhancements, including
-    template and routing annotation capability
+Be careful not to forget the underscore between the CLIENT-DB-ID and the CLIENT-SECRET values. Also don't forget to change the root domain to that of your test domain. 
 
-  * [**DoctrineBundle**][7] - Adds support for the Doctrine ORM
+Once completed you should have a URL that looks similar to this.
 
-  * [**TwigBundle**][8] - Adds support for the Twig templating engine
+```
+http://test/oauth_example/web/app_dev.php/oauth/v2/token?client_id=1_k395ib14g4gg4wc8so8wgwkwk4cocwcgkkokkkko8s4gk04cw&client_secret=2hx6japotmas0go408oso400cock4w4c08wgww4g4o0s04g088&grant_type=password&username=admin&password=admin
+```
 
-  * [**SecurityBundle**][9] - Adds security by integrating Symfony's security
-    component
+and receive a response that looks like this.
 
-  * [**SwiftmailerBundle**][10] - Adds support for Swiftmailer, a library for
-    sending emails
+```
+{
+  "access_token":"NTFlNmM2ZGY5ZmQzNWFjNTdkNDk1YmExZmNjMjZlYWQ2OWEwODQzZTRiNzE5OGU0MDVmY2QzMzIxMGNmMjFjNQ",
+  "expires_in":3600,
+  "token_type":"bearer",
+  "scope":null,
+  "refresh_token":"MDE5NTgxM2UwYzBlYmZkZjg3ZjM0MmM1Y2U5MTQ0NDI0YzEwMWJmMGI1NGI2MThiZmFmOThiYzhlMzc1Yzk4YQ"
+}
+```
 
-  * [**MonologBundle**][11] - Adds support for Monolog, a logging library
 
-  * **WebProfilerBundle** (in dev/test env) - Adds profiling functionality and
-    the web debug toolbar
+From now on you can use the access_token to gain access to the secured /api/ area. Just include it in the http headers of each request by setting the `Authorization` header as follows.
 
-  * **SensioDistributionBundle** (in dev/test env) - Adds functionality for
-    configuring and working with Symfony distributions
+```
+Authorization: Bearer ---access_token---
+```
 
-  * [**SensioGeneratorBundle**][13] (in dev/test env) - Adds code generation
-    capabilities
 
-  * **DebugBundle** (in dev/test env) - Adds Debug and VarDumper component
-    integration
 
-All libraries and bundles included in the Symfony Standard Edition are
-released under the MIT or BSD license.
+Refreshing your token
+---------------------
 
-Enjoy!
+If you should need to refresh your token visit the following URL and include its value where required.
 
-[1]:  https://symfony.com/doc/3.0/book/installation.html
-[6]:  https://symfony.com/doc/current/bundles/SensioFrameworkExtraBundle/index.html
-[7]:  https://symfony.com/doc/3.0/book/doctrine.html
-[8]:  https://symfony.com/doc/3.0/book/templating.html
-[9]:  https://symfony.com/doc/3.0/book/security.html
-[10]: https://symfony.com/doc/3.0/cookbook/email.html
-[11]: https://symfony.com/doc/3.0/cookbook/logging/monolog.html
-[13]: https://symfony.com/doc/3.0/bundles/SensioGeneratorBundle/index.html
+```
+http://test/oauth_example/web/app_dev.php/oauth/v2/token?client_id=---CLIENT-DB-ID---_---CLIENT-SECRET---&client_secret=---CLIENT-SECRET---&grant_type=refresh_token&refresh_token=---REFRESH-TOKEN
+```
